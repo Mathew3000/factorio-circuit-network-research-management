@@ -245,6 +245,23 @@ local function is_multi_level_tech(tech)
   return tech.prototype.level ~= tech.prototype.max_level
 end
 
+local function is_valid_signal(signal)
+  if signal == nil or signal.name == nil then
+    return false
+  end
+
+  local signal_type = signal.type or "item"
+  if signal_type == "virtual" then
+    return prototypes.virtual_signal[signal.name] ~= nil
+  elseif signal_type == "item" then
+    return prototypes.item[signal.name] ~= nil
+  elseif signal_type == "fluid" then
+    return prototypes.fluid[signal.name] ~= nil
+  end
+
+  return false
+end
+
 local function subtract_signals(signals1, signals2)
   local function eq(a, b)
     return
@@ -502,16 +519,18 @@ local function update_signals(research_admin_building)
   logistic_section.active = true
 
   local new_filters = {}
-  for i, output in pairs(new_output) do
-    new_filters[i] = {
-      value = {
-        type = output.signal.type,
-        name = output.signal.name,
-        quality = output.signal.quality or "normal",
-        comparator = "="
-      },
-      min = output.count
-    }
+  for _, output in ipairs(new_output) do
+    if is_valid_signal(output.signal) then
+      new_filters[#new_filters+1] = {
+        value = {
+          type = output.signal.type,
+          name = output.signal.name,
+          quality = output.signal.quality or "normal",
+          comparator = "="
+        },
+        min = output.count
+      }
+    end
   end
   logistic_section.filters = new_filters
 
