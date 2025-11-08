@@ -737,7 +737,8 @@ end
 script.on_configuration_changed(function(changes)
   this_mod_change = changes.mod_changes["circuit-network-research-management"]
   if this_mod_change then
-    if this_mod_change.old_version < "0.0.3" then
+    local old_version = this_mod_change.old_version
+    if old_version and old_version < "0.0.3" then
       local research_admin_buildings = {}
       for unit_number, research_admin_building in pairs(storage.research_admin_buildings) do
         research_admin_buildings[unit_number] = {
@@ -753,7 +754,7 @@ script.on_configuration_changed(function(changes)
       storage.research_admin_buildings = research_admin_buildings
       storage.research_admin_building_ghosts = {}
     end
-    if this_mod_change.old_version < "0.0.5" then
+    if old_version and old_version < "0.0.5" then
       for _, research_admin_building in pairs(storage.research_admin_buildings) do
         research_admin_building.tags = convert_tags_to_0_0_5(research_admin_building.tags)
       end
